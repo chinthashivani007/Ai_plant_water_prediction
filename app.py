@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier
 
+
 # ---------------- PAGE SETTINGS ----------------
 
 st.set_page_config(
@@ -11,6 +12,7 @@ st.set_page_config(
     page_icon="🌱",
     layout="wide"
 )
+
 
 # ---------------- TRAIN AI MODEL ----------------
 
@@ -24,13 +26,15 @@ def train_model():
     temperature = np.random.uniform(15, 42, n)
     humidity = np.random.uniform(20, 95, n)
 
-    # Simulated labels for demonstration only.
-    # These rules are not validated plant-water requirements.
+    # Simulated demonstration labels.
+    # These are not validated real-world watering rules.
     needs_water = (
         (moisture < 30) |
-        ((moisture < 45) &
-         (temperature > 32) &
-         (humidity < 40))
+        (
+            (moisture < 45) &
+            (temperature > 32) &
+            (humidity < 40)
+        )
     ).astype(int)
 
     X = pd.DataFrame({
@@ -48,7 +52,9 @@ def train_model():
 
     return model
 
+
 model = train_model()
+
 
 # ---------------- WEBSITE DESIGN ----------------
 
@@ -57,12 +63,15 @@ st.markdown("""
 .stApp {
     background-color: #f2f8f1;
 }
+
 h1 {
     color: #176b3a;
 }
+
 h2, h3 {
     color: #267348;
 }
+
 div.stButton > button {
     background-color: #218838;
     color: white;
@@ -73,44 +82,61 @@ div.stButton > button {
 </style>
 """, unsafe_allow_html=True)
 
+
+# ---------------- WEBSITE TITLE ----------------
+
 st.title("🌱 AI-Based Plant Water Requirement Prediction")
 
 st.markdown("""
-### Smart plant care using Biology and Artificial Intelligence
+### Smart Plant Care Using Biology and Artificial Intelligence
 
-Enter your plant's environmental conditions to explore
-an AI-generated watering prediction.
+Enter your plant name and environmental conditions
+to explore a plant-watering prediction.
 """)
 
 st.info(
-    "Educational demonstration: the current model uses "
-    "simulated data. Its predictions are not validated "
-    "watering advice for real plants."
+    "Educational demonstration: this model uses "
+    "simulated data. Its predictions have not been "
+    "validated as watering advice for real plants."
 )
+
 
 # ---------------- SIDEBAR ----------------
 
 st.sidebar.header("🌿 Plant Information")
-Plant Information
-
-st.sidebar.header("🌿 Plant Information")
 
 plant = st.sidebar.text_input(
-"Enter any plant name",
-placeholder="Example: Mango, Tulsi, Rose"
+    "Enter any plant name",
+    placeholder="Example: Mango, Tulsi, Rose"
 )
 
 if plant.strip():
-st.sidebar.success(f"Selected plant: {plant.strip()}")
+    st.sidebar.success(
+        f"Selected plant: {plant.strip()}"
+    )
 else:
-st.sidebar.info("Enter the name of your plant.")
+    st.sidebar.info(
+        "Please enter the name of your plant."
+    )
 
 st.sidebar.markdown("""
-### About this project
-This project explores how environmental data and
-machine learning can support plant care and water
-conservation.
+---
+### About This Project
+
+This project demonstrates how environmental
+measurements and machine learning can support
+plant care and water conservation.
+
+### Features
+
+- Enter a plant name
+- Monitor soil moisture
+- Check temperature
+- Check humidity
+- View prediction results
+- Explore environmental charts
 """)
+
 
 # ---------------- USER INPUTS ----------------
 
@@ -120,7 +146,7 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     moisture = st.slider(
-        "💧 Soil moisture (%)",
+        "💧 Soil Moisture (%)",
         min_value=0,
         max_value=100,
         value=35
@@ -136,80 +162,136 @@ with col2:
 
 with col3:
     humidity = st.slider(
-        "☁️ Relative humidity (%)",
+        "☁️ Relative Humidity (%)",
         min_value=10,
         max_value=100,
         value=50
     )
 
+
 # ---------------- PREDICTION ----------------
 
 if st.button("🔍 Predict Water Requirement"):
 
-    sample = pd.DataFrame({
-        "Moisture": [moisture],
-        "Temperature": [temperature],
-        "Humidity": [humidity]
-    })
+    if not plant.strip():
 
-    prediction = int(model.predict(sample)[0])
-
-    st.divider()
-    st.subheader("🤖 AI Prediction Result")
-
-    if prediction == 1:
         st.warning(
-            "💧 The model predicts that watering may be needed."
+            "Please enter a plant name before predicting."
         )
-        st.write(
-            "Check the actual soil condition and the selected "
-            "plant's care requirements before watering."
-        )
+
     else:
-        st.success(
-            "🌿 The model predicts that watering may not "
-            "be needed yet."
-        )
+
+        sample = pd.DataFrame({
+            "Moisture": [moisture],
+            "Temperature": [temperature],
+            "Humidity": [humidity]
+        })
+
+        prediction = int(model.predict(sample)[0])
+
+        st.divider()
+
+        st.subheader("🤖 AI Prediction Result")
+
         st.write(
-            "Continue monitoring the soil and plant."
+            f"🌱 Plant entered: **{plant.strip()}**"
         )
 
-    # Display entered measurements
-    st.subheader("📊 Environmental Data Summary")
+        if prediction == 1:
 
-    a, b, c = st.columns(3)
+            st.warning(
+                "💧 The demonstration model predicts "
+                "that watering may be needed."
+            )
 
-    a.metric("Soil Moisture", f"{moisture}%")
-    b.metric("Temperature", f"{temperature} °C")
-    c.metric("Humidity", f"{humidity}%")
+            st.write(
+                "Check the soil and the care requirements "
+                "of your particular plant before watering."
+            )
 
-   # Create chart
-    chart_data = pd.DataFrame({
-        "Measurement": [
-            "Soil Moisture (%)",
-            "Temperature (°C)",
-            "Humidity (%)"
-        ],
-        "Value": [
-            moisture,
-            temperature,
-            humidity
-        ]
-    })
+        else:
 
-    st.subheader("📈 Environmental Measurements")
+            st.success(
+                "🌿 The demonstration model predicts "
+                "that watering may not be needed yet."
+            )
 
-    fig, ax = plt.subplots(figsize=(8, 4))
+            st.write(
+                "Continue monitoring the soil and "
+                "your plant's condition."
+            )
 
-    ax.bar(
-        chart_data["Measurement"],
-        chart_data["Value"]
-    )
+        st.caption(
+            "This is a simulated prediction. "
+            "It does not account for the specific "
+            "water requirements of each plant species."
+        )
 
-    ax.set_ylabel("Recorded value")
-    ax.set_title("Plant Environmental Conditions")
+        # ---------------- DATA SUMMARY ----------------
 
-    plt.xticks(rotation=10)
-    plt.tight_layout()
+        st.subheader("📊 Environmental Data Summary")
 
-    st.pyplot(fig)
+        a, b, c = st.columns(3)
+
+        a.metric(
+            "Soil Moisture",
+            f"{moisture}%"
+        )
+
+        b.metric(
+            "Temperature",
+            f"{temperature} °C"
+        )
+
+        c.metric(
+            "Humidity",
+            f"{humidity}%"
+        )
+
+        # ---------------- CHART ----------------
+
+        chart_data = pd.DataFrame({
+            "Measurement": [
+                "Soil Moisture (%)",
+                "Temperature (°C)",
+                "Humidity (%)"
+            ],
+
+            "Value": [
+                moisture,
+                temperature,
+                humidity
+            ]
+        })
+
+        st.subheader("📈 Environmental Measurements")
+
+        fig, ax = plt.subplots(figsize=(9, 4))
+
+        ax.bar(
+            chart_data["Measurement"],
+            chart_data["Value"]
+        )
+
+        ax.set_ylabel("Recorded Value")
+        ax.set_title(
+            f"Environmental Conditions for {plant.strip()}"
+        )
+
+        plt.xticks(rotation=10)
+        plt.tight_layout()
+
+        st.pyplot(fig)
+
+        plt.close(fig)
+
+
+# ---------------- FOOTER ----------------
+
+st.divider()
+
+st.markdown(
+    "<center>🌱 AI Plant Water Predictor | "
+    "Educational Project</center>",
+    unsafe_allow_html=True
+)
