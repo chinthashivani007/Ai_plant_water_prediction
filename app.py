@@ -177,9 +177,33 @@ if st.button("🔍 Predict Water Requirement"):
     b.metric("Temperature", f"{temperature} °C")
     c.metric("Humidity", f"{humidity}%")
 
-    # Create chart
+   # Create chart
     chart_data = pd.DataFrame({
         "Measurement": [
             "Soil Moisture (%)",
             "Temperature (°C)",
-            "Humidit
+            "Humidity (%)"
+        ],
+        "Value": [
+            moisture,
+            temperature,
+            humidity
+        ]
+    })
+
+    st.subheader("📈 Environmental Measurements")
+
+    fig, ax = plt.subplots(figsize=(8, 4))
+
+    ax.bar(
+        chart_data["Measurement"],
+        chart_data["Value"]
+    )
+
+    ax.set_ylabel("Recorded value")
+    ax.set_title("Plant Environmental Conditions")
+
+    plt.xticks(rotation=10)
+    plt.tight_layout()
+
+    st.pyplot(fig)
