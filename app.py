@@ -91,13 +91,19 @@ st.info(
 # ---------------- SIDEBAR ----------------
 
 st.sidebar.header("🌿 Plant Information")
+Plant Information
 
-plant = st.sidebar.selectbox(
-    "Choose your plant",
-    ["Tomato", "Rose", "Mint", "Basil", "Bean", "Money Plant"]
+st.sidebar.header("🌿 Plant Information")
+
+plant = st.sidebar.text_input(
+"Enter any plant name",
+placeholder="Example: Mango, Tulsi, Rose"
 )
 
-st.sidebar.write("Selected plant:", plant)
+if plant.strip():
+st.sidebar.success(f"Selected plant: {plant.strip()}")
+else:
+st.sidebar.info("Enter the name of your plant.")
 
 st.sidebar.markdown("""
 ### About this project
