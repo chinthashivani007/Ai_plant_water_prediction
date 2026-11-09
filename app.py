@@ -61,75 +61,192 @@ model = train_model()
 
 
 # ==========================================
-# SESSION HISTORY
+# SESSION STORAGE
 # ==========================================
 
 if "history" not in st.session_state:
     st.session_state.history = []
 
+if "reminders" not in st.session_state:
+    st.session_state.reminders = []
+
 
 # ==========================================
-# PLANT INFORMATION
+# PLANT DATABASE
 # ==========================================
 
 plant_data = {
 
     "rose": {
-        "soil": "Well-drained, fertile soil",
+        "type": "Flowering Plant",
+        "soil": "Well-drained fertile soil",
         "sunlight": "Around 6 hours of direct sunlight",
-        "water": "Water when the upper soil begins to dry",
-        "care": "Remove dry leaves and maintain good airflow."
+        "watering": "Water when the upper soil begins to dry",
+        "care": "Remove dry leaves and provide good airflow.",
+        "small": (100, 250),
+        "medium": (250, 600),
+        "large": (600, 1200)
     },
 
     "tulsi": {
+        "type": "Medicinal Plant",
         "soil": "Well-drained soil",
         "sunlight": "Bright sunlight",
-        "water": "Water when the upper soil begins to dry",
-        "care": "Provide sunlight and avoid waterlogging."
+        "watering": "Water when the upper soil begins to dry",
+        "care": "Avoid waterlogging and provide sunlight.",
+        "small": (100, 200),
+        "medium": (200, 400),
+        "large": (400, 800)
     },
 
     "aloe vera": {
+        "type": "Succulent Plant",
         "soil": "Sandy, well-draining soil",
-        "sunlight": "Bright light",
-        "water": "Allow soil to dry between watering",
-        "care": "Avoid overwatering."
+        "sunlight": "Bright indirect or suitable direct light",
+        "watering": "Allow soil to dry thoroughly between watering",
+        "care": "Avoid overwatering.",
+        "small": (30, 100),
+        "medium": (75, 200),
+        "large": (150, 350)
     },
 
     "money plant": {
+        "type": "Indoor Plant",
         "soil": "Loose, well-draining soil",
-        "sunlight": "Indirect bright light",
-        "water": "Water when the upper soil becomes dry",
-        "care": "Clean leaves and avoid excessive watering."
+        "sunlight": "Bright indirect light",
+        "watering": "Water when the upper soil becomes dry",
+        "care": "Avoid standing water.",
+        "small": (75, 150),
+        "medium": (150, 350),
+        "large": (300, 700)
     },
 
     "tomato": {
+        "type": "Vegetable Plant",
         "soil": "Fertile, well-drained soil",
         "sunlight": "Full sunlight",
-        "water": "Maintain consistent soil moisture",
-        "care": "Support the plant and monitor pests."
+        "watering": "Maintain consistent soil moisture",
+        "care": "Avoid irregular watering and monitor pests.",
+        "small": (150, 300),
+        "medium": (300, 700),
+        "large": (700, 1500)
     },
 
     "mango": {
+        "type": "Fruit Tree",
         "soil": "Well-drained soil",
         "sunlight": "Full sunlight",
-        "water": "Water according to soil moisture and growth stage",
-        "care": "Avoid waterlogging and maintain healthy soil."
+        "watering": "Depends on tree age, root area and soil moisture",
+        "care": "Avoid waterlogging.",
+        "small": (250, 500),
+        "medium": (500, 1000),
+        "large": (1000, 2500)
     },
 
     "hibiscus": {
+        "type": "Flowering Plant",
         "soil": "Fertile, well-drained soil",
         "sunlight": "Several hours of sunlight",
-        "water": "Keep soil appropriately moist",
-        "care": "Remove dry flowers and leaves."
+        "watering": "Keep soil appropriately moist",
+        "care": "Remove dry flowers and leaves.",
+        "small": (100, 250),
+        "medium": (250, 600),
+        "large": (600, 1200)
     },
 
     "sunflower": {
+        "type": "Flowering Plant",
         "soil": "Well-drained fertile soil",
         "sunlight": "Full sunlight",
-        "water": "Water according to soil moisture",
-        "care": "Provide enough sunlight and space."
+        "watering": "Water according to soil moisture",
+        "care": "Provide sufficient sunlight and space.",
+        "small": (150, 300),
+        "medium": (300, 700),
+        "large": (700, 1500)
+    },
+
+    "neem": {
+        "type": "Tree",
+        "soil": "Well-drained soil",
+        "sunlight": "Full sunlight",
+        "watering": "Young plants need more monitoring than established trees",
+        "care": "Avoid excessive watering.",
+        "small": (200, 400),
+        "medium": (400, 900),
+        "large": (900, 2000)
+    },
+
+    "jasmine": {
+        "type": "Flowering Plant",
+        "soil": "Well-drained fertile soil",
+        "sunlight": "Bright sunlight",
+        "watering": "Water when the upper soil starts drying",
+        "care": "Prune when needed.",
+        "small": (100, 200),
+        "medium": (200, 500),
+        "large": (500, 1000)
     }
 }
+
+
+# ==========================================
+# WATER QUANTITY CALCULATION
+# ==========================================
+
+def calculate_water(
+    plant,
+    pot_size,
+    soil_type,
+    age,
+    temperature
+):
+
+    key = plant.strip().lower()
+
+    if key not in plant_data:
+        return None
+
+    info = plant_data[key]
+
+    if pot_size == "Small (10-15 cm)":
+        low, high = info["small"]
+
+    elif pot_size == "Medium (15-25 cm)":
+        low, high = info["medium"]
+
+    elif pot_size == "Large (25-35 cm)":
+        low, high = info["large"]
+
+    else:
+        return None
+
+    # Illustrative adjustments only.
+    # Actual water needs require soil and plant observations.
+
+    if age == "Seedling":
+        low *= 0.5
+        high *= 0.5
+
+    elif age == "Young Plant":
+        low *= 0.75
+        high *= 0.75
+
+    if soil_type == "Clay Soil":
+        low *= 0.75
+        high *= 0.75
+
+    elif soil_type == "Sandy Soil":
+        low *= 1.1
+        high *= 1.1
+
+    if temperature >= 35:
+        st.info(
+            "High temperature: check soil moisture "
+            "more frequently. Do not automatically "
+            "increase watering."
+        )
+
+    return round(low), round(high)
 
 
 # ==========================================
@@ -160,11 +277,6 @@ div.stButton > button {
     width: 100%;
 }
 
-div.stButton > button:hover {
-    background-color: #145c2e;
-    color: white;
-}
-
 [data-testid="stMetric"] {
     background-color: white;
     padding: 15px;
@@ -176,12 +288,10 @@ div.stButton > button:hover {
 
 
 # ==========================================
-# SIDEBAR NAVIGATION
+# SIDEBAR
 # ==========================================
 
 st.sidebar.title("🌿 SmartPlant AI")
-
-st.sidebar.markdown("### Plant Care System")
 
 page = st.sidebar.radio(
     "Navigate",
@@ -198,76 +308,60 @@ page = st.sidebar.radio(
     ]
 )
 
-st.sidebar.divider()
-
-st.sidebar.info(
-    "SmartPlant AI helps users explore "
-    "plant care using environmental "
-    "measurements and machine learning."
-)
-
 
 # ==========================================
-# HOME PAGE
+# HOME
 # ==========================================
 
 if page == "🏠 Home":
 
-    st.title("🌱 Welcome to SmartPlant AI")
+    st.title("🌱 SmartPlant AI")
 
     st.subheader(
-        "Intelligent Plant Care & Water Prediction System"
+        "AI-Based Plant Water Requirement Prediction"
     )
 
     st.write(
-        "Explore plant care, environmental conditions "
-        "and educational machine-learning predictions."
+        "A smart plant-care educational application "
+        "using biology and artificial intelligence."
     )
 
     st.info(
-        "This application uses simulated training data "
-        "for educational demonstration. It does not "
-        "provide scientifically validated watering advice."
+        "The machine-learning model is trained using "
+        "simulated data. Water quantities are illustrative "
+        "starting estimates, not validated irrigation advice."
     )
 
-    col1, col2, col3 = st.columns(3)
+    c1, c2, c3 = st.columns(3)
 
-    col1.metric(
-        "🌿 Predictions",
+    c1.metric(
+        "Total Predictions",
         len(st.session_state.history)
     )
 
-    col2.metric(
-        "🪴 Plant Guides",
+    c2.metric(
+        "Plant Profiles",
         len(plant_data)
     )
 
-    col3.metric(
-        "📊 Application",
-        "Active"
+    c3.metric(
+        "Saved Reminders",
+        len(st.session_state.reminders)
     )
 
     st.divider()
 
-    st.subheader("✨ Application Features")
+    st.subheader("Application Features")
 
-    c1, c2, c3 = st.columns(3)
+    st.write("🌱 Plant selection")
 
-    with c1:
-        st.markdown("### 🌱 Plant Selection")
-        st.write("Enter plant names and explore care information.")
+    st.write("💧 Water quantity recommendations")
 
-    with c2:
-        st.markdown("### 💧 Water Prediction")
-        st.write("Explore environmental-based ML predictions.")
+    st.write("🤖 AI water prediction")
 
-    with c3:
-        st.markdown("### 📊 Analytics")
-        st.write("Review environmental measurements and history.")
+    st.write("🌤️ Environmental information")
 
-    st.success(
-        "Select a section from the sidebar to get started!"
-    )
+    st.write("📊 Analytics and prediction history")
 
 
 # ==========================================
@@ -279,15 +373,11 @@ elif page == "🌱 Plant Selection":
     st.title("🌱 Plant Selection")
 
     plant = st.text_input(
-        "Enter your plant name",
-        placeholder="Example: Rose, Mango, Tulsi"
+        "Enter Plant Name",
+        placeholder="Example: Rose, Tulsi, Mango"
     )
 
     if plant.strip():
-
-        st.success(
-            f"Selected Plant: {plant.strip().title()}"
-        )
 
         key = plant.strip().lower()
 
@@ -295,27 +385,28 @@ elif page == "🌱 Plant Selection":
 
             info = plant_data[key]
 
-            st.subheader("🌿 Plant Information")
+            st.success(
+                f"Plant found: {plant.title()}"
+            )
+
+            st.write("**Plant Type:**", info["type"])
 
             st.write("**Soil:**", info["soil"])
 
             st.write("**Sunlight:**", info["sunlight"])
 
-            st.write("**Water:**", info["water"])
+            st.write("**Watering:**", info["watering"])
 
-            st.write("**Care Tips:**", info["care"])
+            st.write("**Care:**", info["care"])
 
         else:
 
-            st.info(
-                "This plant is accepted by the application, "
-                "but a verified care profile is not yet available. "
-                "Please consult a reliable plant-care source."
+            st.warning(
+                "This plant is not yet in our verified "
+                "care-information collection. You can still "
+                "enter its name in the prediction section, "
+                "but plant-specific water estimates are unavailable."
             )
-
-    else:
-
-        st.info("Enter a plant name to explore.")
 
 
 # ==========================================
@@ -324,11 +415,16 @@ elif page == "🌱 Plant Selection":
 
 elif page == "💧 Water Prediction":
 
-    st.title("💧 AI Plant Water Requirement Prediction")
+    st.title("💧 AI Water Requirement Prediction")
+
+    st.write(
+        "Enter plant and environmental information "
+        "to explore a demonstration prediction."
+    )
 
     plant = st.text_input(
         "Plant Name",
-        placeholder="Enter any plant name"
+        placeholder="Example: Rose, Aloe Vera, Tulsi"
     )
 
     col1, col2, col3 = st.columns(3)
@@ -354,27 +450,76 @@ elif page == "💧 Water Prediction":
             10, 100, 50
         )
 
+    st.subheader("🪴 Plant Details")
+
+    pot_size = st.selectbox(
+        "Pot Size",
+        [
+            "Small (10-15 cm)",
+            "Medium (15-25 cm)",
+            "Large (25-35 cm)",
+            "Garden Soil"
+        ]
+    )
+
+    soil_type = st.selectbox(
+        "Soil Type",
+        [
+            "Normal Garden Soil",
+            "Sandy Soil",
+            "Clay Soil",
+            "Potting Mix"
+        ]
+    )
+
+    age = st.selectbox(
+        "Plant Age",
+        [
+            "Seedling",
+            "Young Plant",
+            "Mature Plant"
+        ]
+    )
+
+    location = st.selectbox(
+        "Plant Location",
+        [
+            "Indoor",
+            "Outdoor"
+        ]
+    )
+
     if st.button("🔍 Predict Water Requirement"):
 
         if not plant.strip():
 
-            st.warning("Please enter a plant name.")
+            st.warning("Enter a plant name.")
 
         else:
 
             sample = pd.DataFrame({
+
                 "Moisture": [moisture],
+
                 "Temperature": [temperature],
+
                 "Humidity": [humidity]
+
             })
 
             prediction = int(
                 model.predict(sample)[0]
             )
 
-            if prediction == 1:
+            st.divider()
 
-                result = "Water may be needed"
+            st.subheader("🤖 AI Prediction Result")
+
+            st.write(
+                f"**Plant:** {plant.title()}"
+            )
+
+            if prediction == 1:
 
                 st.warning(
                     "💧 The demonstration model predicts "
@@ -383,32 +528,101 @@ elif page == "💧 Water Prediction":
 
             else:
 
-                result = "Water may not be needed yet"
-
                 st.success(
                     "🌿 The demonstration model predicts "
                     "that watering may not be needed yet."
                 )
 
-            st.write(
-                f"Selected plant: **{plant.title()}**"
+            st.caption(
+                "This model is trained on simulated data. "
+                "Its output is not a validated real-world "
+                "watering decision."
             )
 
-            st.caption(
-                "This result comes from simulated training data. "
-                "Check actual soil conditions and plant-specific "
-                "requirements before watering."
-            )
+            st.subheader("🚿 Water Quantity Recommendation")
+
+            key = plant.strip().lower()
+
+            if prediction == 1 and moisture < 25:
+
+                if key in plant_data:
+
+                    if pot_size == "Garden Soil":
+
+                        st.info(
+                            "Garden plants need a different "
+                            "calculation based on root-zone "
+                            "area and soil depth. A pot-based "
+                            "millilitre estimate is not suitable."
+                        )
+
+                    else:
+
+                        result = calculate_water(
+                            plant,
+                            pot_size,
+                            soil_type,
+                            age,
+                            temperature
+                        )
+
+                        if result:
+
+                            low, high = result
+
+                            st.success(
+                                f"Estimated starting range: "
+                                f"{low}–{high} ml"
+                            )
+
+                            st.write(
+                                "Apply water slowly and check "
+                                "whether the root-zone soil "
+                                "becomes appropriately moist."
+                            )
+
+                            st.caption(
+                                "This is an illustrative estimate "
+                                "for a college demonstration, not "
+                                "a scientifically validated dose. "
+                                "Stop if the soil is already moist "
+                                "or water begins draining out."
+                            )
+
+                else:
+
+                    st.warning(
+                        "No plant-specific water quantity "
+                        "is available for this plant yet. "
+                        "Please consult a reliable care guide."
+                    )
+
+            else:
+
+                st.info(
+                    "No additional watering quantity is "
+                    "recommended from this demonstration result. "
+                    "Check the actual soil condition."
+                )
 
             st.subheader("📊 Environmental Summary")
 
             a, b, c = st.columns(3)
 
-            a.metric("Soil Moisture", f"{moisture}%")
+            a.metric(
+                "Soil Moisture",
+                f"{moisture}%"
+            )
 
-            b.metric("Temperature", f"{temperature} °C")
+            b.metric(
+                "Temperature",
+                f"{temperature} °C"
+            )
 
-            c.metric("Humidity", f"{humidity}%")
+            c.metric(
+                "Humidity",
+                f"{humidity}%"
+            )
 
             st.session_state.history.append({
 
@@ -422,28 +636,35 @@ elif page == "💧 Water Prediction":
 
                 "Humidity": humidity,
 
-                "Prediction": result
+                "Pot Size": pot_size,
+
+                "Soil": soil_type,
+
+                "Age": age,
+
+                "Location": location,
+
+                "Prediction": (
+                    "Water may be needed"
+                    if prediction == 1
+                    else "Water may not be needed"
+                )
 
             })
 
 
 # ==========================================
-# WEATHER SECTION
+# WEATHER
 # ==========================================
 
 elif page == "🌤️ Weather":
 
-    st.title("🌤️ Environmental Conditions")
-
-    st.write(
-        "Enter local weather observations to explore "
-        "their possible influence on plant watering."
-    )
+    st.title("🌤️ Weather Information")
 
     temperature = st.slider(
         "Temperature (°C)",
         10, 45, 28,
-        key="weather_temp"
+        key="weather_temperature"
     )
 
     humidity = st.slider(
@@ -455,29 +676,21 @@ elif page == "🌤️ Weather":
     rainfall = st.number_input(
         "Rainfall (mm)",
         min_value=0.0,
-        max_value=500.0,
         value=0.0
     )
 
     if rainfall > 0:
 
         st.info(
-            "Rainfall has been recorded. Check the soil "
-            "before adding more water."
+            "Rainfall recorded. Check soil moisture "
+            "before watering."
         )
 
     if temperature > 35:
 
         st.warning(
-            "High temperature recorded. Monitor soil "
-            "moisture more frequently."
-        )
-
-    elif temperature < 20:
-
-        st.info(
-            "Lower temperature recorded. Water needs "
-            "may differ depending on the plant."
+            "High temperature. Monitor soil moisture "
+            "more frequently."
         )
 
     if humidity < 35:
@@ -486,14 +699,9 @@ elif page == "🌤️ Weather":
             "Low humidity recorded."
         )
 
-    else:
-
-        st.success(
-            "Environmental observations recorded."
-        )
-
     st.caption(
-        "These are manually entered observations, not live weather data."
+        "Enter locally observed values. This section "
+        "does not fetch live weather data."
     )
 
 
@@ -503,62 +711,48 @@ elif page == "🌤️ Weather":
 
 elif page == "📅 Watering Schedule":
 
-    st.title("📅 Smart Watering Schedule")
-
-    st.write(
-        "Create a weekly plant-monitoring plan."
-    )
-
-    plant = st.text_input(
-        "Plant Name",
-        key="schedule_plant"
-    )
+    st.title("📅 Plant Monitoring Schedule")
 
     start_date = st.date_input(
         "Start Date",
         date.today()
     )
 
-    st.subheader("🌱 Weekly Monitoring Plan")
-
     activities = [
         "Check soil moisture",
-        "Inspect leaves and soil",
+        "Inspect leaves",
         "Check soil moisture",
-        "Review plant condition",
+        "Inspect plant condition",
         "Check soil moisture",
-        "Inspect for pests",
+        "Look for pests",
         "Review plant health"
     ]
 
-    schedule_data = []
+    schedule = []
 
     for i in range(7):
 
-        current_date = start_date + timedelta(days=i)
+        d = start_date + timedelta(days=i)
 
-        schedule_data.append({
+        schedule.append({
 
-            "Date": current_date,
+            "Date": d,
 
-            "Day": current_date.strftime("%A"),
+            "Day": d.strftime("%A"),
 
             "Activity": activities[i]
 
         })
 
-    schedule_df = pd.DataFrame(schedule_data)
-
     st.dataframe(
-        schedule_df,
+        pd.DataFrame(schedule),
         use_container_width=True,
         hide_index=True
     )
 
     st.info(
-        "This is a monitoring schedule, not a fixed watering "
-        "instruction. Water only when the plant's actual "
-        "requirements and soil condition indicate it is needed."
+        "This is a monitoring schedule. It does not "
+        "mean plants must be watered every day."
     )
 
 
@@ -571,31 +765,23 @@ elif page == "🪴 Plant Care Guide":
     st.title("🪴 Plant Care Guide")
 
     selected = st.selectbox(
-        "Choose a plant",
+        "Select Plant",
         list(plant_data.keys())
     )
 
     info = plant_data[selected]
 
-    st.subheader(
-        f"🌿 {selected.title()}"
-    )
+    st.subheader(selected.title())
 
-    st.write("### Soil Requirements")
+    st.write("**Plant Type:**", info["type"])
 
-    st.write(info["soil"])
+    st.write("**Soil:**", info["soil"])
 
-    st.write("### Sunlight Requirements")
+    st.write("**Sunlight:**", info["sunlight"])
 
-    st.write(info["sunlight"])
+    st.write("**Watering:**", info["watering"])
 
-    st.write("### Water Requirements")
-
-    st.write(info["water"])
-
-    st.write("### Maintenance Tips")
-
-    st.success(info["care"])
+    st.write("**Care Tips:**", info["care"])
 
 
 # ==========================================
@@ -604,40 +790,34 @@ elif page == "🪴 Plant Care Guide":
 
 elif page == "📊 Analytics":
 
-    st.title("📊 Plant Analytics Dashboard")
+    st.title("📊 Analytics Dashboard")
 
-    if len(st.session_state.history) == 0:
-
-        st.info(
-            "Make some predictions to see your analytics."
-        )
-
-    else:
+    if st.session_state.history:
 
         df = pd.DataFrame(
             st.session_state.history
         )
 
-        col1, col2, col3 = st.columns(3)
+        c1, c2, c3 = st.columns(3)
 
-        col1.metric(
-            "Total Predictions",
+        c1.metric(
+            "Predictions",
             len(df)
         )
 
-        col2.metric(
-            "Plants Recorded",
+        c2.metric(
+            "Different Plants",
             df["Plant"].nunique()
         )
 
-        col3.metric(
+        c3.metric(
             "Average Moisture",
             f"{df['Moisture'].mean():.1f}%"
         )
 
-        st.subheader("📈 Moisture Measurements")
+        st.subheader("Soil Moisture History")
 
-        fig, ax = plt.subplots(figsize=(9, 4))
+        fig, ax = plt.subplots()
 
         ax.plot(
             range(1, len(df) + 1),
@@ -647,57 +827,54 @@ elif page == "📊 Analytics":
 
         ax.set_xlabel("Prediction Number")
 
-        ax.set_ylabel("Soil Moisture (%)")
+        ax.set_ylabel("Moisture (%)")
 
-        ax.set_title("Soil Moisture History")
+        ax.set_title("Plant Moisture Measurements")
 
         st.pyplot(fig)
 
         plt.close(fig)
-
-        st.subheader("🌡️ Environmental Data")
 
         st.dataframe(
             df,
             use_container_width=True
         )
 
+    else:
+
+        st.info(
+            "Make predictions to view analytics."
+        )
+
 
 # ==========================================
-# PREDICTION HISTORY
+# HISTORY
 # ==========================================
 
 elif page == "📜 Prediction History":
 
     st.title("📜 Prediction History")
 
-    if len(st.session_state.history) == 0:
+    if st.session_state.history:
 
-        st.info(
-            "No predictions recorded yet."
-        )
-
-    else:
-
-        history_df = pd.DataFrame(
+        df = pd.DataFrame(
             st.session_state.history
         )
 
         st.dataframe(
-            history_df,
-            use_container_width=True,
-            hide_index=True
+            df,
+            use_container_width=True
         )
 
-        csv = history_df.to_csv(
+        csv = df.to_csv(
             index=False
         ).encode("utf-8")
 
         st.download_button(
-            "⬇️ Download Prediction History",
-            data=csv,
-            file_name="plant_prediction_history.csv",
-            mime="text/csv"
+            "Download History",
+            csv,
+            "plant_history.csv",
+            "text/csv"
         )
 
         if st.button("Clear History"):
@@ -705,6 +882,10 @@ elif page == "📜 Prediction History":
             st.session_state.history = []
 
             st.rerun()
+
+    else:
+
+        st.info("No prediction history available.")
 
 
 # ==========================================
@@ -715,82 +896,4 @@ elif page == "🔔 Reminders":
 
     st.title("🔔 Plant Care Reminders")
 
-    st.write(
-        "Create a reminder to check your plant."
-    )
-
-    reminder_plant = st.text_input(
-        "Plant Name",
-        key="reminder_plant"
-    )
-
-    reminder_date = st.date_input(
-        "Reminder Date",
-        date.today(),
-        key="reminder_date"
-    )
-
-    reminder_note = st.text_input(
-        "Reminder Activity",
-        value="Check soil moisture"
-    )
-
-    if st.button("Save Reminder"):
-
-        if reminder_plant.strip():
-
-            if "reminders" not in st.session_state:
-
-                st.session_state.reminders = []
-
-            st.session_state.reminders.append({
-
-                "Plant": reminder_plant.title(),
-
-                "Date": str(reminder_date),
-
-                "Activity": reminder_note
-
-            })
-
-            st.success("Reminder saved!")
-
-        else:
-
-            st.warning("Enter a plant name.")
-
-    if "reminders" in st.session_state:
-
-        st.subheader("📋 Your Reminders")
-
-        for reminder in st.session_state.reminders:
-
-            st.write(
-                f"🌱 **{reminder['Plant']}** — "
-                f"{reminder['Date']} — "
-                f"{reminder['Activity']}"
-            )
-
-    st.info(
-        "These are in-app reminders. They do not send "
-        "automatic phone notifications."
-    )
-
-
-# ==========================================
-# FOOTER
-# ==========================================
-
-st.divider()
-
-st.markdown("""
-<center>
-
-🌱 <b>SmartPlant AI</b>
-
-AI-Based Plant Water Requirement Prediction
-
-Educational Biology & Artificial Intelligence Project
-
-</center>
-""", unsafe_allow_html=True)
+    reminder_plant = st.text_input
