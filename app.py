@@ -689,7 +689,8 @@ elif page == "📜 Prediction History":
     if len(st.session_state.history) == 0:
 
         st.info("No prediction history available.")
-else:
+
+    else:
 
         history_df = pd.DataFrame(
             st.session_state.history
@@ -713,7 +714,6 @@ else:
             st.session_state.history = []
             st.success("History cleared.")
             st.rerun()
-
 # ---------------------------------------
 # REMINDERS PAGE
 # ---------------------------------------
