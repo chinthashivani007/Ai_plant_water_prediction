@@ -718,7 +718,7 @@ else:
 # REMINDERS PAGE
 # ---------------------------------------
 
-else page == "🔔 Reminders":
+elif page == "🔔 Reminders":
 
     st.title("🔔 Plant Care Reminders")
 
